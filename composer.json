@@ -19,7 +19,8 @@
     "require-dev":
     {
         "rayamedia/yima-settings": "dev-master",
-        "rayamedia/yima-widgetator": "dev-master"
+        "rayamedia/yima-widgetator": "dev-master",
+        "google/apiclient": "dev-master"
     },
     "minimum-stability": "dev",
     "autoload" : {
