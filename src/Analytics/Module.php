@@ -1,5 +1,5 @@
 <?php
-namespace gAnalytics;
+namespace Analytics;
 
 class Module
 {

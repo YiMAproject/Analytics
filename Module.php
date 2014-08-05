@@ -1,2 +1,2 @@
 <?php
-require_once __DIR__ . '/src/gAnalytics/Module.php';
+require_once __DIR__ . '/src/Analytics/Module.php';

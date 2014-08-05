@@ -1,5 +1,5 @@
 {
-    "name": "rayamedia/yima-google-analytics",
+    "name": "rayamedia/yima-analytics",
     "description": "Google Analytics Implemented Module For ZF2.",
     "keywords": [
         "zf2 module",
@@ -24,7 +24,7 @@
     "minimum-stability": "dev",
     "autoload" : {
         "psr-0" : {
-            "gAnalytics\\" : "src/"
+            "Analytics\\" : "src/"
         },
         "classmap" : [
             "./Module.php"
