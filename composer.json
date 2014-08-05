@@ -1,0 +1,39 @@
+{
+    "name": "rayamedia/yima-google-analytics",
+    "description": "Google Analytics Implemented Module For ZF2.",
+    "keywords": [
+        "zf2 module",
+        "yima module",
+        "google analytics",
+        "raya media"
+    ],
+    "authors": [
+        {
+            "name": "Payam Naderi",
+            "email": "naderi.payam@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "require-dev":
+    {
+        "rayamedia/yima-settings": "dev-master",
+        "rayamedia/yima-widgetator": "dev-master"
+    },
+    "minimum-stability": "dev",
+    "autoload" : {
+        "psr-0" : {
+            "gAnalytics\\" : "src/"
+        },
+        "classmap" : [
+            "./Module.php"
+        ]
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://packages.raya-media.com/"
+        }
+    ]
+}
