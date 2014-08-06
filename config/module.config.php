@@ -47,4 +47,23 @@ return array(
             ),
         ),
     ),
+
+    # Add menu item into adminor navigation
+    'navigation' => array(
+        'admin' => array(
+            array(
+                'label' 	 => 'Analytics',
+                'route'		 => \yimaAdminor\Module::ADMIN_DEFAULT_ROUTE_NAME,
+                'module'     =>'Analytics',
+                'controller' => 'Index',
+                //'action'     => 'dashboard', // by default
+            ),
+        ),
+    ),
+
+    'view_manager' => array(
+        'template_path_stack' => array(
+            __DIR__ . '/../view',
+        ),
+    ),
 );

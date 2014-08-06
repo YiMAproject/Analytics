@@ -64,5 +64,4 @@ interface ServiceAnalyticsInterface
      * @return array
      */
     public function getTrafficKeywords();
-
 }
