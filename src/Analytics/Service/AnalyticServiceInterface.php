@@ -1,12 +1,13 @@
 <?php
 namespace Analytics\Service;
+use Analytics\Service\Client\Interfaces\ClientInterface;
 
 /**
  * Interface ServiceAnalyticsInterface
  *
  * @package Analytics\Service
  */
-interface ServiceAnalyticsInterface
+interface AnalyticServiceInterface
 {
     /**
      * Set Service Client Object

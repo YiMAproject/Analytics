@@ -20,11 +20,11 @@ class Module implements
      *
      * @return void
      */
-    public function init(ModuleManagerInterface $moduleManager)
+    public function init(ModuleManagerInterface $moduleModuleManager)
     {
-        /** @var $moduleManager \Zend\ModuleManager\ModuleManager */
+        /** @var $moduleModuleManager \Zend\ModuleManager\ModuleManager */
 
-        $moduleManager->loadModule('yimaSettings');
+        $moduleModuleManager->loadModule('yimaSettings');
     }
 
     /**
@@ -37,7 +37,7 @@ class Module implements
     {
         return array(
             'factories' => array(
-                'Analytics.Client' => 'Analytics\Service\ClientFactory'
+                // 'Analytics.Client' => 'Analytics\Service\ClientFactory'
             ),
         );
     }

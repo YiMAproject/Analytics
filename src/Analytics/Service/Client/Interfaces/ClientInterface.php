@@ -1,5 +1,5 @@
 <?php
-namespace Analytics\Service;
+namespace Analytics\Service\Client\Interfaces;
 
 /**
  * Interface ClientInterface

@@ -1,12 +1,13 @@
 <?php
-namespace Analytics\Service;
+namespace Analytics\Service\Client\Interfaces;
 
 /**
  * Interface ClientOauthInterface
+ * : Clients that usually used oauth for authorization
  *
  * @package Analytics\Service
  */
-interface ClientOauthInterface extends ClientInterface
+interface OauthInterface extends ClientInterface
 {
     /**
      * Get Authorization Url
