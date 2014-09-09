@@ -37,7 +37,7 @@ class Module implements
     {
         return array(
             'factories' => array(
-                // 'Analytics.Client' => 'Analytics\Service\ClientFactory'
+               'Analytics.Client' => 'Analytics\Service\ClientFactory'
             ),
         );
     }

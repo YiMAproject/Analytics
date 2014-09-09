@@ -18,11 +18,20 @@ interface OauthInterface extends ClientInterface
 
     /**
      * Usually Code Returned After AuthURL Confirm
-     * : used by authorize in oauth methods
+     * : used by authorize in oauth methods as access token
+     *
+     * @param string $accToken Access Token
      *
      * @return mixed
      */
-    public function setAuthToken();
+    public function setAuthToken($accToken);
+
+    /**
+     * Get AuthToken
+     *
+     * @return string
+     */
+    public function getAuthToken();
 
     /**
      * Revoke Access From Client
@@ -30,4 +39,11 @@ interface OauthInterface extends ClientInterface
      * @return $this
      */
     public function revokeAccess();
+
+    /**
+     * Has Refresh Token
+     *
+     * @return boolean
+     */
+    public function hasRefreshToken();
 }
