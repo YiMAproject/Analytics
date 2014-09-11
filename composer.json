@@ -14,10 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
-    },
-    "require-dev":
-    {
+        "php": ">=5.3.3",
         "rayamedia/yima-settings": "dev-master",
         "rayamedia/yima-widgetator": "dev-master",
         "google/apiclient": "dev-master"
