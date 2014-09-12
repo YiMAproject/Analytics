@@ -7,8 +7,15 @@ namespace Analytics\Service\Client\Interfaces;
  *
  * @package Analytics\Service
  */
-interface OauthInterface extends ClientInterface
+interface OauthClientInterface extends ClientInterface
 {
+    /**
+     * Get Client Engine Object
+     *
+     * @return mixed
+     */
+    public function getEngine();
+
     /**
      * Get Authorization Url
      *

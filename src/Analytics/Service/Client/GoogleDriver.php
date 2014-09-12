@@ -1,16 +1,30 @@
 <?php
 namespace Analytics\Service\Client;
 
-use Analytics\Service\Client\Interfaces\OauthInterface;
+use Analytics\Service\Client\Interfaces\OauthClientInterface;
 
-class GoogleClient implements OauthInterface
+class GoogleDriver implements OauthClientInterface
 {
     const SESSION_STORAGE_KEY = 'googleanalytic_session_key';
 
     /**
      * @var \Google_Client
      */
-    protected $client;
+    protected $engine;
+
+    /**
+     * Default and Needed Options
+     *
+     * @var array
+     */
+    protected $options = array(
+        'application'   => null,
+        'client_id'     => null,
+        'redirect_uri'  => null,
+        'developer_key' => null,
+        'developer_key' => null,
+        'scopes'        => array('https://www.googleapis.com/auth/analytics.readonly'),
+    );
 
     /**
      * Construct
@@ -19,7 +33,10 @@ class GoogleClient implements OauthInterface
      */
     public function __construct(array $options)
     {
-        $client = new \Google_Client();
+        $options = array_merge($this->options, $options);
+        $this->setOptions($options);
+
+        $client = $this->getEngine();
         $client->setApplicationName($options['application']);
 
         // Visit https://console.developers.google.com/ to generate your
@@ -28,16 +45,32 @@ class GoogleClient implements OauthInterface
         $client->setClientSecret($options['client_secret']);
         $client->setRedirectUri($options['redirect_uri']);
         $client->setDeveloperKey($options['developer_key']);
-        $client->setScopes(array('https://www.googleapis.com/auth/analytics.readonly'));
-        /**
-         * When your application receives a refresh token, it is important to store that refresh token for future use.
-         * If your application loses the refresh token, it will have to re-prompt the user for consent before obtaining
-         * another refresh token. If you need to re-prompt the user for consent, include the approval_prompt parameter
-         * in the authorization code request, and set the value to force
-         */
-        $client->setAccessType('offline'); // In some cases, your application may need to access a Google API when the user is not present
+        $client->setScopes($options['scopes']);
 
-        $this->client = $client;
+        $this->engine = $client;
+    }
+
+    /**
+     * Get Client Engine Object
+     *
+     * @return \Google_Client
+     */
+    public function getEngine()
+    {
+        if (!$this->engine) {
+            $client = new \Google_Client();
+            /**
+             * When your application receives a refresh token, it is important to store that refresh token for future use.
+             * If your application loses the refresh token, it will have to re-prompt the user for consent before obtaining
+             * another refresh token. If you need to re-prompt the user for consent, include the approval_prompt parameter
+             * in the authorization code request, and set the value to force
+             */
+            $client->setAccessType('offline'); // In some cases, your application may need to access a Google API when the user is not present
+
+            $this->engine = $client;
+        }
+
+        return $this->engine;
     }
 
     /**
@@ -45,6 +78,7 @@ class GoogleClient implements OauthInterface
      * - store authorization tokens in storage like session
      * - return true on success and false on failure
      *
+     * @throws \Exception
      * @return boolean
      */
     public function authorize()
@@ -86,7 +120,7 @@ class GoogleClient implements OauthInterface
      */
     public function isAuthorized()
     {
-        return ($this->client->getAccessToken() && !$this->client->isAccessTokenExpired());
+        return ($this->engine->getAccessToken() && !$this->engine->isAccessTokenExpired());
     }
 
     /**
@@ -96,7 +130,7 @@ class GoogleClient implements OauthInterface
      */
     public function getAuthUrl()
     {
-        return $this->client->createAuthUrl();
+        return $this->engine->createAuthUrl();
     }
 
     /**
@@ -109,7 +143,7 @@ class GoogleClient implements OauthInterface
      */
     public function setAuthToken($accToken)
     {
-        $this->client->setAccessToken($accToken);
+        $this->engine->setAccessToken($accToken);
 
         return $this;
     }
@@ -125,10 +159,10 @@ class GoogleClient implements OauthInterface
         if ($accessToken)
             $this->setAuthToken($accessToken);
 
-        if (!$this->client->getAccessToken() || $this->client->isAccessTokenExpired()) {
-            $this->client->refreshToken($this->getRefreshToken());
+        if (!$this->engine->getAccessToken() || $this->engine->isAccessTokenExpired()) {
+            $this->engine->refreshToken($this->getRefreshToken());
 
-            $this->session->google['analytic_token'] = $this->client->getAccessToken();
+            $this->session->google['analytic_token'] = $this->engine->getAccessToken();
         }
     }
 
@@ -143,7 +177,7 @@ class GoogleClient implements OauthInterface
         if ($this->hasRefreshToken())
             $refreshToken = $this->getRefreshToken();
 
-        $this->client->revokeToken($refreshToken);
+        $this->engine->revokeToken($refreshToken);
 
         /* @TODO Settings: remove refresh token */
         // ...
