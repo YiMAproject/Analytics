@@ -16,14 +16,13 @@ class Module implements
     /**
      * Initialize workflow
      *
-     * @param ModuleManagerInterface $manager
+     * @param \Zend\ModuleManager\ModuleManagerInterface $moduleModuleManager
+     * @internal param \Zend\ModuleManager\ModuleManagerInterface $manager
      *
      * @return void
      */
     public function init(ModuleManagerInterface $moduleModuleManager)
     {
-        /** @var $moduleModuleManager \Zend\ModuleManager\ModuleManager */
-
         $moduleModuleManager->loadModule('yimaSettings');
     }
 
