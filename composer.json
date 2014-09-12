@@ -14,8 +14,9 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "rayamedia/yima-settings": "dev-master",
+        "php": ">=5.3.3"
+    },
+    "require-dev": {
         "google/apiclient": "dev-master"
     },
     "minimum-stability": "dev",
