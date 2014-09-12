@@ -2,7 +2,7 @@
 return array(
     'yima-settings' => array(
         'analytics' => array(
-            'label' => 'Analytics / Google Settings',
+            'label' => 'Google Analytics Settings',
             'properties' => array(
                 // Visit https://console.developers.google.com/ to generate your
                 // client id, client secret, and to register your redirect uri.

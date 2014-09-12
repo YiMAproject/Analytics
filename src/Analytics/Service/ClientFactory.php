@@ -20,7 +20,8 @@ class ClientFactory implements FactoryInterface
     {
         /** @var $settings \yimaSettings\Service\Settings */
         $settings = $serviceLocator->get('yimaSettings');
-        $settings = $settings->get('analytics')->getArrayCopy();
+        $settings = $settings->get('analytics')
+            ->getArrayCopy();
 
         $client = new GoogleClient($settings);
 
