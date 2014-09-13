@@ -1,9 +1,9 @@
 <?php
 namespace Analytics\Service\Client;
 
-use Analytics\Service\Client\Interfaces\OauthClientInterface;
+use Analytics\Service\Client\Interfaces\ClientOauthInterface;
 
-class GoogleDriver implements OauthClientInterface
+class GoogleDriver implements ClientOauthInterface
 {
     const SESSION_STORAGE_KEY = 'googleanalytic_session_key';
 
@@ -13,41 +13,19 @@ class GoogleDriver implements OauthClientInterface
     protected $engine;
 
     /**
-     * Default and Needed Options
-     *
-     * @var array
+     * @var GoogleDriverConfig
      */
-    protected $options = array(
-        'application'   => null,
-        'client_id'     => null,
-        'redirect_uri'  => null,
-        'developer_key' => null,
-        'developer_key' => null,
-        'scopes'        => array('https://www.googleapis.com/auth/analytics.readonly'),
-    );
+    protected $config;
 
     /**
      * Construct
      *
      * @param array $options
      */
-    public function __construct(array $options)
+    public function __construct(array $options = array())
     {
-        $options = array_merge($this->options, $options);
-        $this->setOptions($options);
-
-        $client = $this->getEngine();
-        $client->setApplicationName($options['application']);
-
-        // Visit https://console.developers.google.com/ to generate your
-        // client id, client secret, and to register your redirect uri.
-        $client->setClientId($options['client_id']);
-        $client->setClientSecret($options['client_secret']);
-        $client->setRedirectUri($options['redirect_uri']);
-        $client->setDeveloperKey($options['developer_key']);
-        $client->setScopes($options['scopes']);
-
-        $this->engine = $client;
+        $this->config()
+            ->setFromArray($options);
     }
 
     /**
@@ -71,6 +49,19 @@ class GoogleDriver implements OauthClientInterface
         }
 
         return $this->engine;
+    }
+
+    /**
+     * Client Configuration
+     *
+     * @return GoogleDriverConfig
+     */
+    public function config()
+    {
+        if (!$this->config)
+            $this->config = new GoogleDriverConfig($this->getEngine());
+
+        return $this->config;
     }
 
     /**
