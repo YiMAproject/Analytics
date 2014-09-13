@@ -1,5 +1,6 @@
 <?php
 namespace Analytics\Service\Client\Interfaces;
+use Analytics\Service\Client\AbstractDriverConfig;
 
 /**
  * Interface ClientOauthInterface
@@ -7,7 +8,7 @@ namespace Analytics\Service\Client\Interfaces;
  *
  * @package Analytics\Service
  */
-interface OauthClientInterface extends ClientInterface
+interface ClientOauthInterface extends ClientInterface
 {
     /**
      * Get Client Engine Object
@@ -15,6 +16,13 @@ interface OauthClientInterface extends ClientInterface
      * @return mixed
      */
     public function getEngine();
+
+    /**
+     * Client Configuration
+     *
+     * @return AbstractDriverConfig
+     */
+    public function config();
 
     /**
      * Get Authorization Url

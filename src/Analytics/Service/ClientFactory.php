@@ -3,7 +3,7 @@
 namespace Analytics\Service;
 
 use Analytics\Service\Client\GoogleDriver;
-use Analytics\Service\Client\Interfaces\OauthClientInterface;
+use Analytics\Service\Client\Interfaces\ClientOauthInterface;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -14,7 +14,7 @@ class ClientFactory implements FactoryInterface
      *
      * @param ServiceLocatorInterface $serviceLocator
      *
-     * @return OauthClientInterface
+     * @return ClientOauthInterface
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
