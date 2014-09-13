@@ -8,8 +8,26 @@ use Analytics\Service\Client\AbstractClientConfig;
  *
  * @package Analytics\Service
  */
-interface ClientOauthInterface extends ClientInterface
+interface ClientOauthInterface
 {
+    /**
+     * Authorize Client
+     * - store authorization tokens in storage like session
+     * - return true on success and false on failure
+     *
+     * @param string $getBackCode The Code Returned from AuthURL
+     *
+     * @return boolean
+     */
+    public function authorize($getBackCode);
+
+    /**
+     * Is Client Authorized?
+     *
+     * @return boolean
+     */
+    public function isAuthorized();
+
     /**
      * Get Client Engine Object
      *
@@ -54,11 +72,4 @@ interface ClientOauthInterface extends ClientInterface
      * @return $this
      */
     public function revokeAccess();
-
-    /**
-     * Has Refresh Token
-     *
-     * @return boolean
-     */
-    public function hasRefreshToken();
 }

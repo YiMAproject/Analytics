@@ -2,8 +2,13 @@
 namespace Analytics\Service\Client;
 
 use Analytics\Service\Client\Interfaces\ClientOauthInterface;
+use Zend\ServiceManager\ServiceManager;
+use Zend\ServiceManager\ServiceManagerAwareInterface;
+use Zend\Session\Container;
 
-class Google implements ClientOauthInterface
+class Google implements
+    ClientOauthInterface,
+    ServiceManagerAwareInterface
 {
     const SESSION_STORAGE_KEY = 'googleanalytic_session_key';
 
@@ -18,6 +23,17 @@ class Google implements ClientOauthInterface
     protected $config;
 
     /**
+     * @var Container
+     */
+    protected $session;
+
+    /**
+     * : to store refreshToken in settings
+     * @var ServiceManager
+     */
+    protected $sm;
+
+    /**
      * Construct
      *
      * @param array $options
@@ -26,6 +42,8 @@ class Google implements ClientOauthInterface
     {
         $this->config()
             ->setFromArray($options);
+
+        $this->session = new Container(self::SESSION_STORAGE_KEY);
     }
 
     /**
@@ -69,38 +87,26 @@ class Google implements ClientOauthInterface
      * - store authorization tokens in storage like session
      * - return true on success and false on failure
      *
+     * @param string $getBackCode The Code Returned from AuthURL
+     *
      * @throws \Exception
      * @return boolean
      */
-    public function authorize()
+    public function authorize($getBackCode)
     {
-        $getBackCode = $this->getRequest()->getQuery('code');
-        if ($getBackCode)
-        {
-            $auth = $client->authenticate($getBackCode);
-            $auth = json_decode($auth, true);
+        $auth = $this->engine->authenticate($getBackCode);
+        $auth = json_decode($auth, true);
 
-            if (!isset($auth['refresh_token'])) {
-                throw new \Exception('Not Refresh Token Found.');
-            }
+        /**
+         * After your application receives the refresh token, it may obtain new access tokens at any time.
+         * @see https://developers.google.com/accounts/docs/OAuth2WebServer#refresh
+         */
+        if (isset($auth['refresh_token']))
+            $this->setRefreshToken($auth['refresh_token']);
 
-            /**
-             * After your application receives the refresh token, it may obtain new access tokens at any time.
-             * @see https://developers.google.com/accounts/docs/OAuth2WebServer#refresh
-             */
-            Client::setRefreshToken($auth['refresh_token']);
+        $this->setAuthToken($this->engine->getAccessToken());
 
-            $this->session->user['analytics_token'] = $client->getAccessToken();
-
-            // the code url parameter is stripped from the URL to keep things looking neat
-            $this->_redirect($this->getCurrentURL());
-        }
-        /* _________------------------================ ``````````````````````````````` ================------------------_________ */
-
-        $refreshToken = Client::getRefreshToken();
-        if ($refreshToken) {
-            $this->view->refreshToken = $refreshToken;
-        }
+        return true;
     }
 
     /**
@@ -111,7 +117,7 @@ class Google implements ClientOauthInterface
      */
     public function isAuthorized()
     {
-        return ($this->engine->getAccessToken() && !$this->engine->isAccessTokenExpired());
+        return ($this->getAuthToken() && !$this->engine->isAccessTokenExpired());
     }
 
     /**
@@ -134,6 +140,8 @@ class Google implements ClientOauthInterface
      */
     public function setAuthToken($accToken)
     {
+        $this->session->token = $this->engine->getAccessToken();
+
         $this->engine->setAccessToken($accToken);
 
         return $this;
@@ -146,15 +154,24 @@ class Google implements ClientOauthInterface
      */
     public function getAuthToken()
     {
-        $accessToken = $this->session->google['analytic_token'];
+        $accessToken = $this->session->token;
         if ($accessToken)
             $this->setAuthToken($accessToken);
 
         if (!$this->engine->getAccessToken() || $this->engine->isAccessTokenExpired()) {
-            $this->engine->refreshToken($this->getRefreshToken());
+            // Refresh the token if expired
+            try {
+                $this->engine->refreshToken($this->getRefreshToken());
+                $this->session->token = $this->engine->getAccessToken();
+            } catch (\Exception $e)
+            {
+                // Invalid Refresh Token, And Current Token is Invalid
+                return false;
+            }
 
-            $this->session->google['analytic_token'] = $this->engine->getAccessToken();
         }
+
+        return $this->engine->getAccessToken();
     }
 
     /**
@@ -165,24 +182,13 @@ class Google implements ClientOauthInterface
     public function revokeAccess()
     {
         $refreshToken = null;
-        if ($this->hasRefreshToken())
+        if ($this->getRefreshToken())
             $refreshToken = $this->getRefreshToken();
 
         $this->engine->revokeToken($refreshToken);
 
-        /* @TODO Settings: remove refresh token */
-        // ...
-
-    }
-
-    /**
-     * Has Refresh Token
-     *
-     * @return boolean
-     */
-    public function hasRefreshToken()
-    {
-        // TODO: Implement hasRefreshToken() method.
+        // Remove Refresh Token From Storage ................
+        $this->setRefreshToken(null);
     }
 
     /**
@@ -190,8 +196,46 @@ class Google implements ClientOauthInterface
      *
      * @return string
      */
-    public function getRefreshToken()
+    protected function getRefreshToken()
     {
+        $settStorage = $this->getSettingStorage()
+            ->get('analytics');
 
+        return $settStorage->get('refresh_token')->value;
+    }
+
+    protected function setRefreshToken($token)
+    {
+        $settStorage   = $this->getSettingStorage();
+        $storageEntity = $settStorage->get('analytics');
+        $refreshToken  = $storageEntity->get('refresh_token');
+        $refreshToken->value = $token;
+        $storageEntity->set('refresh_token', $refreshToken);
+
+        $settStorage->save($storageEntity);
+    }
+
+    /**
+     * Set service manager
+     *
+     * @param ServiceManager $serviceManager
+     */
+    public function setServiceManager(ServiceManager $serviceManager)
+    {
+        $this->sm = $serviceManager;
+    }
+
+    /**
+     * Get Settings Storage
+     * : to retrieve and write some settings
+     *
+     * @return \yimaSettings\Service\Settings
+     */
+    protected function getSettingStorage()
+    {
+        /** @var $settings \yimaSettings\Service\Settings */
+        $settings = $this->sm->get('yimaSettings');
+
+        return $settings;
     }
 }

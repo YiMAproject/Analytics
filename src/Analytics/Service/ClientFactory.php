@@ -20,13 +20,16 @@ class ClientFactory implements FactoryInterface
     {
         /** @var $settings \yimaSettings\Service\Settings */
         $settings = $serviceLocator->get('yimaSettings');
-        $settings = $settings->get('analytics')
-            ->getArrayCopy();
-
-        $client = new Google($settings);
+        $settings = $settings->get('analytics');
+        $anltConf = [];
+        foreach ($settings->getArrayCopy() as $key => $val)
+            $anltConf[$key] = $val['value'];
+        $client = new Google($anltConf);
         $client->config()
             // Access Analytics Data as Readonly
             ->setScopes(array('https://www.googleapis.com/auth/analytics.readonly'));
+
+        $client->setServiceManager($serviceLocator);
 
         return $client;
     }
