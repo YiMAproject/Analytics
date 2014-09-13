@@ -1,7 +1,7 @@
 <?php
 namespace Analytics\Service\Client;
 
-class GoogleDriverConfig extends AbstractDriverConfig
+class GoogleConfig extends AbstractClientConfig
 {
     /**
      * @var \Google_Client
@@ -21,7 +21,10 @@ class GoogleDriverConfig extends AbstractDriverConfig
         'client_secret'    => null,
         'redirect_uri'     => null,
         'developer_key'    => null,
-        'scopes'           => array('https://www.googleapis.com/auth/analytics.readonly'),
+        'scopes'           => [
+            'https://www.googleapis.com/auth/userinfo.profile',
+            'https://www.googleapis.com/auth/userinfo.email'
+        ],
         'application_name' => null,
     ];
 

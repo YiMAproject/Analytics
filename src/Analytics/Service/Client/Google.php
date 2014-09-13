@@ -3,7 +3,7 @@ namespace Analytics\Service\Client;
 
 use Analytics\Service\Client\Interfaces\ClientOauthInterface;
 
-class GoogleDriver implements ClientOauthInterface
+class Google implements ClientOauthInterface
 {
     const SESSION_STORAGE_KEY = 'googleanalytic_session_key';
 
@@ -13,7 +13,7 @@ class GoogleDriver implements ClientOauthInterface
     protected $engine;
 
     /**
-     * @var GoogleDriverConfig
+     * @var GoogleConfig
      */
     protected $config;
 
@@ -54,12 +54,12 @@ class GoogleDriver implements ClientOauthInterface
     /**
      * Client Configuration
      *
-     * @return GoogleDriverConfig
+     * @return GoogleConfig
      */
     public function config()
     {
         if (!$this->config)
-            $this->config = new GoogleDriverConfig($this->getEngine());
+            $this->config = new GoogleConfig($this->getEngine());
 
         return $this->config;
     }

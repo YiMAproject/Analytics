@@ -1,6 +1,6 @@
 <?php
 namespace Analytics\Service\Client\Interfaces;
-use Analytics\Service\Client\AbstractDriverConfig;
+use Analytics\Service\Client\AbstractClientConfig;
 
 /**
  * Interface ClientOauthInterface
@@ -20,7 +20,7 @@ interface ClientOauthInterface extends ClientInterface
     /**
      * Client Configuration
      *
-     * @return AbstractDriverConfig
+     * @return AbstractClientConfig
      */
     public function config();
 

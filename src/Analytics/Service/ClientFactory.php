@@ -2,7 +2,7 @@
 
 namespace Analytics\Service;
 
-use Analytics\Service\Client\GoogleDriver;
+use Analytics\Service\Client\Google;
 use Analytics\Service\Client\Interfaces\ClientOauthInterface;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -23,7 +23,10 @@ class ClientFactory implements FactoryInterface
         $settings = $settings->get('analytics')
             ->getArrayCopy();
 
-        $client = new GoogleDriver($settings);
+        $client = new Google($settings);
+        $client->config()
+            // Access Analytics Data as Readonly
+            ->setScopes(array('https://www.googleapis.com/auth/analytics.readonly'));
 
         return $client;
     }

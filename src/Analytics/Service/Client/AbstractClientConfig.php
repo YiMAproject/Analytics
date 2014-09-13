@@ -3,7 +3,7 @@ namespace Analytics\Service\Client;
 
 use Analytics\Service\Client\Interfaces\ClientInterface;
 
-abstract class AbstractDriverConfig
+abstract class AbstractClientConfig
 {
     /**
      * @var ClientInterface
