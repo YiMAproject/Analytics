@@ -44,6 +44,7 @@ class Google implements
             ->setFromArray($options);
 
         $this->session = new Container(self::SESSION_STORAGE_KEY);
+        $this->session->setExpirationSeconds(3600);
     }
 
     /**
@@ -99,6 +100,7 @@ class Google implements
 
         /**
          * After your application receives the refresh token, it may obtain new access tokens at any time.
+         * Refresh token only returned once after authorizing, you have to store it.
          * @see https://developers.google.com/accounts/docs/OAuth2WebServer#refresh
          */
         if (isset($auth['refresh_token']))
@@ -140,9 +142,9 @@ class Google implements
      */
     public function setAuthToken($accToken)
     {
-        $this->session->token = $this->getEngine()->getAccessToken();
-
         $this->getEngine()->setAccessToken($accToken);
+
+        $this->session->token = $this->getEngine()->getAccessToken();
 
         return $this;
     }
@@ -156,7 +158,7 @@ class Google implements
     {
         $accessToken = $this->session->token;
         if ($accessToken)
-            $this->setAuthToken($accessToken);
+            $this->getEngine()->setAccessToken($accessToken);
 
         if (!$this->getEngine()->getAccessToken() || $this->getEngine()->isAccessTokenExpired()) {
             // Refresh the token if expired
