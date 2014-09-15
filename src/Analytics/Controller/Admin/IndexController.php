@@ -30,8 +30,10 @@ class IndexController extends AbstractActionController
         /** @var $client \Analytics\Service\Client\Google */
         $client = $this->serviceLocator->get('Analytics.Client');
 
-        /*if (!$client->isAuthorized())
-            $this->redirect()->toUrl($client->getAuthUrl());*/
-
+        return array(
+            'has_authorized' => $client->getAuthToken(),
+            'url_authorize'  => $client->getAuthUrl(),  // auth url if not authorized
+            'url_revoke'     => // link to revoke access router
+        );
     }
 }
