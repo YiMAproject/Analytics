@@ -57,6 +57,29 @@ return array(
                 'module'     =>'Analytics',
                 'controller' => 'Index',
                 //'action'     => 'dashboard', // by default
+                'pages' 	 => array(
+                    /*array(
+                        'label' 	 => 'Dashboard',
+                        'route'		 => \yimaAdminor\Module::ADMIN_ROUTE_NAME,
+                        'order' 	 => -10000,
+                    ),*/
+                    array(
+                        'label' 	 => 'Grant Access',
+                        'route'		 => \yimaAdminor\Module::ADMIN_DEFAULT_ROUTE_NAME,
+                        'module'     => 'Analytics',
+                        'controller' => 'Index',
+                        'action'     => 'access',
+                    ),
+                    array(
+                        'label' 	 => 'Settings',
+                        'route'		 => \yimaAdminor\Module::ADMIN_DEFAULT_ROUTE_NAME,
+                        'module'     =>'yimaSettings',
+                        'params'     => array(
+                            'setting'    => 'analytics',
+                        ),
+                        'order' 	 => -10000,
+                    ),
+                ),
             ),
         ),
     ),

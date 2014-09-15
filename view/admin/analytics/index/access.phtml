@@ -1,0 +1,50 @@
+<h2>Analytics</h2>
+<div style="padding: 30px;">
+                <h3 id="register_project">1. Register an application in the Google Developers Console</h3>
+                <p>Every query made to the Analytics API must be associated with a registered
+                    project in the <a href="https://console.developers.google.com/">Google Developers Console</a>.
+                    Without a registered project, your application will not receive full quota.</p>
+                <p>Creating a project will provide you with a Client ID and Key that will be used
+                    to identify your application when making requests to the Analytics service. To
+                    learn more about the Client IDs and Keys, read
+                    <a href="/console/help/using-keys">Keys, access, security, and identity</a></p>
+
+                <div class="ds-selector-tabs ds-selector ui-datasection-main" data-ds-scope="language-selection">
+                    <section data-ds-value="php" class="">
+                        <h3 style="display: none;">PHP</h3>
+                        <h4>Create a Google Developers Console Project</h4>
+                        <p>Application type: <strong>Web Application</strong><br>
+                            Authentication type: <strong>OAuth 2.0</strong></p>
+
+                        <p>If you haven't already registered your application with the Google Developers Console, then <a href="https://console.developers.google.com//start/api?id=analytics&amp;credential=client_key">set up a project and application in the Developers Console</a>. The system guides you through the process of choosing or creating a project and registering a new application, and it automatically activates the API for you.</p>
+                        <p>If you've already registered your application with the Developers Console, then follow this procedure instead:</p>
+
+                        <ol>
+                            <li>  Go to the <a href="https://console.developers.google.com/">Google Developers Console</a>.</li>
+                            <li>Select a project.</li>
+                            <li>In the sidebar on the left, select <b>APIs &amp; auth</b>.In the list of APIs, make sure the status is <b>ON</b> for the Analytics API.</li>
+                            <li>In the sidebar on the left, select <b>Credentials</b>.</li>
+                        </ol>
+
+                        <p>In either case, you end up on the application's credentials page.</p>
+                        <p>To find your application's client ID and client secret, and set a redirect URI, expand the OAuth 2.0 Client ID section.</p>
+                        <p>To find your application's API key, expand the Browser Key or Server Key sections.</p>
+
+                        <aside class="note"><strong>Note</strong>: The Redirect URI field must
+                            point to the exact URL that this script will reside on.
+                            If it is not set by default, you must edit the settings after you
+                            create the Client ID.</aside>
+                    </section>
+
+                </div>
+
+                <br>
+                <h3 id="authorize_access">2. Authorize Access to Google Analytics Data</h3>
+                <p>When a user starts an application built with the Google Analytics APIs,
+                    they will have to grant the application access to their Google Analytics data.
+                    This process is called authorization. The recommended method for authorizing users
+                    is OAuth 2.0.
+                </p>
+
+                                <p>You have Refresh Token, <a href="/analytics/revoke" class="alert red">Revoke Access!</a> to stop access your data.</p>
+                            </div>
