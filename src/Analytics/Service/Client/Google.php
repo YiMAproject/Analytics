@@ -89,12 +89,12 @@ class Google implements
      *
      * @param string $getBackCode The Code Returned from AuthURL
      *
-     * @throws \Exception
+     * @throws \Google_Auth_Exception
      * @return boolean
      */
     public function authorize($getBackCode)
     {
-        $auth = $this->engine->authenticate($getBackCode);
+        $auth = $this->getEngine()->authenticate($getBackCode);
         $auth = json_decode($auth, true);
 
         /**
@@ -104,7 +104,7 @@ class Google implements
         if (isset($auth['refresh_token']))
             $this->setRefreshToken($auth['refresh_token']);
 
-        $this->setAuthToken($this->engine->getAccessToken());
+        $this->setAuthToken($this->getEngine()->getAccessToken());
 
         return true;
     }
@@ -117,7 +117,7 @@ class Google implements
      */
     public function isAuthorized()
     {
-        return ($this->getAuthToken() && !$this->engine->isAccessTokenExpired());
+        return ($this->getAuthToken() && !$this->getEngine()->isAccessTokenExpired());
     }
 
     /**
@@ -127,7 +127,7 @@ class Google implements
      */
     public function getAuthUrl()
     {
-        return $this->engine->createAuthUrl();
+        return $this->getEngine()->createAuthUrl();
     }
 
     /**
@@ -140,9 +140,9 @@ class Google implements
      */
     public function setAuthToken($accToken)
     {
-        $this->session->token = $this->engine->getAccessToken();
+        $this->session->token = $this->getEngine()->getAccessToken();
 
-        $this->engine->setAccessToken($accToken);
+        $this->getEngine()->setAccessToken($accToken);
 
         return $this;
     }
@@ -158,11 +158,11 @@ class Google implements
         if ($accessToken)
             $this->setAuthToken($accessToken);
 
-        if (!$this->engine->getAccessToken() || $this->engine->isAccessTokenExpired()) {
+        if (!$this->getEngine()->getAccessToken() || $this->getEngine()->isAccessTokenExpired()) {
             // Refresh the token if expired
             try {
-                $this->engine->refreshToken($this->getRefreshToken());
-                $this->session->token = $this->engine->getAccessToken();
+                $this->getEngine()->refreshToken($this->getRefreshToken());
+                $this->session->token = $this->getEngine()->getAccessToken();
             } catch (\Exception $e)
             {
                 // Invalid Refresh Token, And Current Token is Invalid
@@ -171,7 +171,7 @@ class Google implements
 
         }
 
-        return $this->engine->getAccessToken();
+        return $this->getEngine()->getAccessToken();
     }
 
     /**
@@ -185,7 +185,7 @@ class Google implements
         if ($this->getRefreshToken())
             $refreshToken = $this->getRefreshToken();
 
-        $this->engine->revokeToken($refreshToken);
+        $this->getEngine()->revokeToken($refreshToken);
 
         // Remove Refresh Token From Storage ................
         $this->setRefreshToken(null);

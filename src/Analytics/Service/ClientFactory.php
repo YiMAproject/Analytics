@@ -27,7 +27,9 @@ class ClientFactory implements FactoryInterface
         $client = new Google($anltConf);
         $client->config()
             // Access Analytics Data as Readonly
-            ->setScopes(array('https://www.googleapis.com/auth/analytics.readonly'));
+            ->setScopes(array('https://www.googleapis.com/auth/analytics.readonly'))
+            ->setApplicationName('YiMa Analytics')
+        ;
 
         $client->setServiceManager($serviceLocator);
 
