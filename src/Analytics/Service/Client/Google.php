@@ -2,6 +2,7 @@
 namespace Analytics\Service\Client;
 
 use Analytics\Service\Client\Interfaces\ClientOauthInterface;
+use Zend\Json\Json;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\Session\Container;
@@ -179,18 +180,28 @@ class Google implements
     /**
      * Revoke Access From Client
      *
-     * @return $this
+     * @return boolean
      */
     public function revokeAccess()
     {
-        $refreshToken = null;
         if ($this->getRefreshToken())
-            $refreshToken = $this->getRefreshToken();
+            $token = $this->getRefreshToken();
+        else {
+            $token = $this->getAuthToken();
+            $token = Json::decode($token);
+            $token = $token->access_token;
+        }
 
-        $this->getEngine()->revokeToken($refreshToken);
+        $isRevoked = $this->getEngine()->revokeToken($token);
+        if ($isRevoked) {
+            // Remove Refresh Token From Storage ................
+            $this->setRefreshToken(null);
+            unset($this->session->token);
 
-        // Remove Refresh Token From Storage ................
-        $this->setRefreshToken(null);
+            return true;
+        }
+
+        return false;
     }
 
     /**

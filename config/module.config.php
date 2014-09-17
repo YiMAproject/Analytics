@@ -1,5 +1,32 @@
 <?php
 return array(
+    'controllers' => array(
+        'invokables' => array(
+            'Analytics.Controller.Index' => 'Analytics\Controller\IndexController'
+        ),
+    ),
+
+    'service_manager' => array(
+        'invokables' => array(
+            'Analytics.Controller.Index' => 'Analytics\Controller\IndexController'
+        ),
+    ),
+
+    'router' => array(
+        'routes' => array(
+            'analytics_oauthaccessback' => array(
+                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'options' => array(
+                    'route'    => '/analytics/accessback',
+                    'defaults' => array(
+                        'controller' => 'Analytics.Controller.Index',
+                        'action'     => 'oauthbackcode',
+                    ),
+                ),
+            ),
+        ),
+    ),
+
     'yima-settings' => array(
         'analytics' => array(
             'label' => 'Google Analytics Settings',

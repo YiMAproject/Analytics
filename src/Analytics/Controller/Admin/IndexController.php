@@ -33,7 +33,37 @@ class IndexController extends AbstractActionController
         return array(
             'has_authorized' => $client->getAuthToken(),
             'url_authorize'  => $client->getAuthUrl(),  // auth url if not authorized
-            'url_revoke'     => // link to revoke access router
+            'url_revoke'     => $this->url()->fromRoute(
+                    \yimaAdminor\Module::ADMIN_DEFAULT_ROUTE_NAME,
+                    array('module' => 'Analytics', 'controller' => 'Index', 'action' => 'revokeAccess')
+            ),
         );
+    }
+
+    /**
+     * Revoke Access From Authorized User
+     */
+    public function revokeAccessAction()
+    {
+        /** @var $client \Analytics\Service\Client\Google */
+        $client = $this->serviceLocator->get('Analytics.Client');
+
+        if ($client->revokeAccess()) {
+            /** @var $request \Zend\Http\PhpEnvironment\Request */
+            $request = $this->getRequest();
+            if ($request->getServer()->offsetExists('HTTP_REFERER'))
+                $referer = $request->getServer()->offsetGet('HTTP_REFERER');
+            else
+                $referer = $this->url()->fromRoute(
+                    \yimaAdminor\Module::ADMIN_DEFAULT_ROUTE_NAME,
+                    array('module' => 'Analytics', 'controller' => 'Index', 'action' => 'access')
+                );
+
+            $this->redirect()->toUrl($referer);
+
+            return $this->getResponse();
+        }
+
+        die('Not Permitted To Access.');
     }
 }

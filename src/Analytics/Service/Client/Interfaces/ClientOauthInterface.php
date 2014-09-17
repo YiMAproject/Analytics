@@ -69,7 +69,7 @@ interface ClientOauthInterface
     /**
      * Revoke Access From Client
      *
-     * @return $this
+     * @return boolean
      */
     public function revokeAccess();
 }
