@@ -138,7 +138,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
 
         /** @var $matchedRoute \Zend\Mvc\Router\Http\RouteMatch */
         $matchedRoute = $e->getRouteMatch();
-        if ($matchedRoute->getMatchedRouteName() == \yimaAdminor\Module::ADMIN_DEFAULT_ROUTE_NAME)
+        if ($matchedRoute && $matchedRoute->getMatchedRouteName() == \yimaAdminor\Module::ADMIN_DEFAULT_ROUTE_NAME)
             // we don't want to track admin area page visits
             return false;
 
