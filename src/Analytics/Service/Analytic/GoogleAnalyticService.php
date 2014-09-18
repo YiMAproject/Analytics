@@ -107,6 +107,18 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
 
     // -----------------------------------------------------------------------------------------------------
 
+    protected function getAnalyticsProfileId()
+    {
+        // TODO: Implement getAnalyticsProfileId() method.
+    }
+
+    protected function getAnalyticsProfileDomain()
+    {
+        // TODO: Implement getAnalyticsProfileDomain() method.
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+
     /**
      * Attach one or more listeners
      *
@@ -130,6 +142,12 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      */
     public function onRenderAttachJScripts(MvcEvent $e)
     {
+        $profileID  = $this->getAnalyticsProfileId();
+        $profDomain = $this->getAnalyticsProfileDomain();
+
+        if (!$profileID || !$profDomain)
+            return false;
+
         if ($e->getResult() instanceof Response
             || !$e->getViewModel() instanceof ViewModel
         )
@@ -152,7 +170,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
               m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
               })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-              ga('create', '"./*$this->_user->getAnalyticsProfileId().*/"', '"./*$this->_user->getDomain().*/"');
+              ga('create', '".$profileID."', '".$profDomain."');
               ga('send', 'pageview');
         ");
 
