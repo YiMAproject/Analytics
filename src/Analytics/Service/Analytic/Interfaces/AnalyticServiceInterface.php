@@ -1,5 +1,6 @@
 <?php
-namespace Analytics\Service;
+namespace Analytics\Service\Analytic\Interfaces;
+
 use Analytics\Service\Client\Interfaces\ClientInterface;
 
 /**

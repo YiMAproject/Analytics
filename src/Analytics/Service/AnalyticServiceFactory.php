@@ -2,7 +2,7 @@
 
 namespace Analytics\Service;
 
-use Analytics\Service\Client\Google;
+use Analytics\Service\Analytic\GoogleAnalyticService;
 use Analytics\Service\Client\Interfaces\ClientOauthInterface;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;

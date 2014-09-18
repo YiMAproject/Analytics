@@ -1,7 +1,8 @@
 <?php
 
-namespace Analytics\Service;
+namespace Analytics\Service\Analytic;
 
+use Analytics\Service\Analytic\Interfaces\AnalyticServiceInterface;
 use Analytics\Service\Client\Interfaces\ClientInterface;
 
 class GoogleAnalyticService implements AnalyticServiceInterface
