@@ -42,13 +42,12 @@ class Module implements
      */
     public function onLoadModulesPostAttachListeners(ModuleEvent $e)
     {
-        /** @var $moduleManager \Zend\ModuleManager\ModuleManager */
-        $moduleManager = $e->getTarget();
-
-        $sm = $moduleManager->getParam('ServiceManager');
+        $sm = $e->getParam('ServiceManager');
         $analytic = $sm->get('Analytics.Service');
 
         if ($analytic instanceof ListenerAnalyticInterface) {
+            /** @var $moduleManager \Zend\ModuleManager\ModuleManager */
+            $moduleManager = $e->getTarget();
             /** @var $sharedEvents \Zend\EventManager\SharedEventManager */
             $sharedEvents = $moduleManager->getEventManager()
                 ->getSharedManager();
