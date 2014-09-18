@@ -24,4 +24,11 @@ interface ClientInterface
      * @return boolean
      */
     public function isAuthorized();
+
+    /**
+     * Get Client Engine Object
+     *
+     * @return mixed
+     */
+    public function getEngine();
 }

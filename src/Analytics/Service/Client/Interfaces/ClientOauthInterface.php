@@ -29,13 +29,6 @@ interface ClientOauthInterface
     public function isAuthorized();
 
     /**
-     * Get Client Engine Object
-     *
-     * @return mixed
-     */
-    public function getEngine();
-
-    /**
      * Client Configuration
      *
      * @return AbstractClientConfig
