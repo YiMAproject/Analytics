@@ -2,6 +2,7 @@
 namespace Analytics\Service\Client;
 
 use Analytics\Service\Client\Interfaces\ClientOauthInterface;
+use Zend\Feed\Reader\Http\ResponseInterface;
 use Zend\Json\Json;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;

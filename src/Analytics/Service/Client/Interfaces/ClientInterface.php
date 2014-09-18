@@ -9,15 +9,6 @@ namespace Analytics\Service\Client\Interfaces;
 interface ClientInterface
 {
     /**
-     * Authorize Client
-     * - store authorization tokens in storage like session
-     * - return true on success and false on failure
-     *
-     * @return boolean
-     */
-    public function authorize();
-
-    /**
      * Is Client Authorized?
      * : with looking over strategy over authorize
      *

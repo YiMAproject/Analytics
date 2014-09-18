@@ -8,7 +8,7 @@ use Analytics\Service\Client\AbstractClientConfig;
  *
  * @package Analytics\Service
  */
-interface ClientOauthInterface
+interface ClientOauthInterface extends ClientInterface
 {
     /**
      * Authorize Client
