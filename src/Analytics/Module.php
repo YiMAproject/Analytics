@@ -1,19 +1,16 @@
 <?php
 namespace Analytics;
 
-use Analytics\Listeners\DefaultAggregate;
-use Zend\EventManager\EventInterface;
+use Analytics\Service\Analytic\Interfaces\ListenerAnalyticInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
-use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\InitProviderInterface;
 use Zend\ModuleManager\Feature\ServiceProviderInterface;
+use Zend\ModuleManager\ModuleEvent;
 use Zend\ModuleManager\ModuleManagerInterface;
-use Zend\Mvc\MvcEvent;
 
 class Module implements
     InitProviderInterface,
-    BootstrapListenerInterface,
     ServiceProviderInterface,
     ConfigProviderInterface,
     AutoloaderProviderInterface
@@ -29,23 +26,35 @@ class Module implements
     public function init(ModuleManagerInterface $moduleModuleManager)
     {
         $moduleModuleManager->loadModule('yimaSettings');
+
+        // attach analytic listeners
+        $events = $moduleModuleManager->getEventManager();
+        $events->attach(
+            ModuleEvent::EVENT_LOAD_MODULES_POST,
+            array($this,'onLoadModulesPostAttachListeners'),
+            -100000
+        );
     }
 
     /**
-     * Listen to the bootstrap event
-     * - attach events
-     *   . to attach track script to pages
+     * Attach Analytic Listener if available
      *
-     * @param EventInterface $e
-     * @return array
      */
-    public function onBootstrap(EventInterface $e)
+    public function onLoadModulesPostAttachListeners(ModuleEvent $e)
     {
-        /** @var $e MvcEvent */
-        $events = $e->getApplication()
-            ->getEventManager();
+        /** @var $moduleManager \Zend\ModuleManager\ModuleManager */
+        $moduleManager = $e->getTarget();
 
-        $events->attachAggregate(new DefaultAggregate());
+        $sm = $moduleManager->getParam('ServiceManager');
+        $analytic = $sm->get('Analytics.Service');
+
+        if ($analytic instanceof ListenerAnalyticInterface) {
+            /** @var $sharedEvents \Zend\EventManager\SharedEventManager */
+            $sharedEvents = $moduleManager->getEventManager()
+                ->getSharedManager();
+
+            $sharedEvents->attachAggregate($analytic);
+        }
     }
 
     /**
