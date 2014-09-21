@@ -93,7 +93,17 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      */
     public function getTrafficKeywords()
     {
+        $trafficKeywords = $this->getAnalyticsEngine()->data_ga->get(
+            'ga:' . $this->getAnalyticsProfileId(),
+            $this->getDateFrom(),
+            $this->getDateTill(),
+            'ga:sessions',
+            array('dimensions' => 'ga:keyword', 'sort' => '-ga:sessions')
+        )->getRows();
 
+        $trafficKeywords = ($trafficKeywords) ? $trafficKeywords : array();
+
+        return $trafficKeywords;
     }
 
     // -----------------------------------------------------------------------------------------------------
