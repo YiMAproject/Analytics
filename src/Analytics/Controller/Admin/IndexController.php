@@ -15,7 +15,13 @@ class IndexController extends AbstractActionController
      */
     public function dashboardAction()
     {
+        /** @var $analytics \Analytics\Service\Analytic\GoogleAnalyticService */
+        $analytics = $this->getServiceLocator()
+            ->get('Analytics.Service');
 
+        return array(
+            'keywords' => $analytics->getTrafficKeywords()
+        );
     }
 
     /**

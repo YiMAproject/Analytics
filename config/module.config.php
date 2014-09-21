@@ -85,11 +85,13 @@ return array(
                 'controller' => 'Index',
                 //'action'     => 'dashboard', // by default
                 'pages' 	 => array(
-                    /*array(
+                    array(
                         'label' 	 => 'Dashboard',
-                        'route'		 => \yimaAdminor\Module::ADMIN_ROUTE_NAME,
-                        'order' 	 => -10000,
-                    ),*/
+                        'route'		 => \yimaAdminor\Module::ADMIN_DEFAULT_ROUTE_NAME,
+                        'module'     => 'Analytics',
+                        //'action'   => 'dashboard', // by default
+                        'order' 	 => 10000,
+                    ),
                     array(
                         'label' 	 => 'Grant Access',
                         'route'		 => \yimaAdminor\Module::ADMIN_DEFAULT_ROUTE_NAME,

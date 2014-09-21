@@ -29,7 +29,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     /**
      * @var Analytics Account Profile Domain
      */
-    protected $analytics_account_profile_domain;
+    protected $analytics_account_profile_domain = 'dehoutoven.nl';
 
     /**
      * @var Analytic Profile TrackID
@@ -89,7 +89,13 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
         if (!$this->getClient())
             throw new \Exception('No Analytics Client Provided Yet.');
 
-        $analytics = new Google_Service_Analytics($this->getClient());
+        if (!$this->getClient()->isAuthorized())
+            throw new \Exception('Analytics Client Not Authorized.');
+
+        $googleClient = $this->getClient()
+            ->getEngine();
+
+        $analytics = new \Google_Service_Analytics($googleClient);
 
         return $analytics;
     }
@@ -281,7 +287,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     public function onRenderAttachJScripts(MvcEvent $e)
     {
         $profileID  = $this->getAnalyticsProfileId();
-        $profDomain = $this->getAnalyticsProfileDomain();
+        $profDomain = $this->analytics_account_profile_domain;
 
         if (!$profileID || !$profDomain)
             return false;
