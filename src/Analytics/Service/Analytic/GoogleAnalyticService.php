@@ -37,6 +37,16 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     protected $analytic_account_profile_trackid;
 
     /**
+     * @var \DateTime
+     */
+    protected $date_from;
+
+    /**
+     * @var \DateTime
+     */
+    protected $date_till;
+
+    /**
      * Set Service Client Object
      *
      * @param ClientInterface $client
@@ -95,8 +105,8 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     {
         $trafficKeywords = $this->getAnalyticsEngine()->data_ga->get(
             'ga:' . $this->getAnalyticsProfileId(),
-            $this->getDateFrom(),
-            $this->getDateTill(),
+            $this->getDateFrom()->format('Y-m-d'),
+            $this->getDateTill()->format('Y-m-d'),
             'ga:sessions',
             array('dimensions' => 'ga:keyword', 'sort' => '-ga:sessions')
         )->getRows();
@@ -117,7 +127,9 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      */
     public function setDateFrom(\DateTime $dateTime)
     {
-        // TODO: Implement setFromDate() method.
+        $this->date_from = $dateTime;
+
+        return $this;
     }
 
     /**
@@ -127,7 +139,15 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      */
     public function getDateFrom()
     {
-        // TODO: Implement getFromDate() method.
+        if (!$this->date_from) {
+            // show from 12 month past
+            $date = new \DateTime();
+            $date->modify('-12 month');
+
+            $this->date_from = $date;
+        }
+
+        return $this->date_from;
     }
 
     /**
@@ -139,7 +159,9 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      */
     public function setDateTill(\DateTime $dateTime)
     {
-        // TODO: Implement setTillDate() method.
+        $this->date_till = $dateTime;
+
+        return $this;
     }
 
     /**
@@ -149,7 +171,10 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      */
     public function getDateTill()
     {
-        // TODO: Implement getTillDate() method.
+        if (!$this->date_till)
+            $this->date_till = new \DateTime();
+
+        return $this->date_till;
     }
 
     // -----------------------------------------------------------------------------------------------------
