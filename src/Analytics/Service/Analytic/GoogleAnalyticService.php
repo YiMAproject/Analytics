@@ -93,7 +93,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      */
     public function getTrafficKeywords()
     {
-        // TODO: Implement getTrafficKeywords() method.
+
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      *
      * @return $this
      */
-    public function setFromDate(\DateTime $dateTime)
+    public function setDateFrom(\DateTime $dateTime)
     {
         // TODO: Implement setFromDate() method.
     }
@@ -115,7 +115,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      *
      * @return \DateTime
      */
-    public function getFromDate()
+    public function getDateFrom()
     {
         // TODO: Implement getFromDate() method.
     }
@@ -127,7 +127,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      *
      * @return $this
      */
-    public function setTillDate(\DateTime $dateTime)
+    public function setDateTill(\DateTime $dateTime)
     {
         // TODO: Implement setTillDate() method.
     }
@@ -137,7 +137,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      *
      * @return \DateTime
      */
-    public function getTillDate()
+    public function getDateTill()
     {
         // TODO: Implement getTillDate() method.
     }

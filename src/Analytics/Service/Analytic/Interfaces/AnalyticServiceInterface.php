@@ -1,31 +1,9 @@
 <?php
 namespace Analytics\Service\Analytic\Interfaces;
 
-use Analytics\Service\Client\Interfaces\ClientInterface;
-
-/**
- * Interface ServiceAnalyticsInterface
- *
- * @package Analytics\Service
- */
-interface AnalyticServiceInterface
+interface AnalyticServiceInterface extends
+    ClientAwareAnalyticInterface
 {
-    /**
-     * Set Service Client Object
-     *
-     * @param ClientInterface $client
-     *
-     * @return $this
-     */
-    public function setClient(ClientInterface $client);
-
-    /**
-     * Get Client Object
-     *
-     * @return ClientInterface
-     */
-    public function getClient();
-
     /**
      * Set Start Date
      *
@@ -33,14 +11,14 @@ interface AnalyticServiceInterface
      *
      * @return $this
      */
-    public function setFromDate(\DateTime $dateTime);
+    public function setDateFrom(\DateTime $dateTime);
 
     /**
      * Get Start Date
      *
      * @return \DateTime
      */
-    public function getFromDate();
+    public function getDateFrom();
 
     /**
      * Set Last Date
@@ -49,14 +27,14 @@ interface AnalyticServiceInterface
      *
      * @return $this
      */
-    public function setTillDate(\DateTime $dateTime);
+    public function setDateTill(\DateTime $dateTime);
 
     /**
      * Get Last Date
      *
      * @return \DateTime
      */
-    public function getTillDate();
+    public function getDateTill();
 
     // --- Features Implementation -------------------------------------------------------------------------------
 
