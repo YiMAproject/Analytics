@@ -17,10 +17,31 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     protected $client;
 
     /**
+     * @var \Google_Service_Analytics
+     */
+    protected $analytics;
+
+    /**
+     * @var Analytics Account Name
+     */
+    protected $analytics_account_name = 'ZUOO';
+
+    /**
+     * @var Analytics Account Profile Domain
+     */
+    protected $analytics_account_profile_domain;
+
+    /**
+     * @var Analytic Profile TrackID
+     */
+    protected $analytic_account_profile_trackid;
+
+    /**
      * Set Service Client Object
      *
      * @param ClientInterface $client
      *
+     * @throws \Exception
      * @return $this
      */
     public function setClient(ClientInterface $client)
@@ -45,6 +66,22 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     public function getClient()
     {
         return $this->client;
+    }
+
+    /**
+     * The client object is used to create an authorized analytics service object.
+     *
+     * @return Google_Service_Analytics
+     * @throws \Exception
+     */
+    protected function getAnalyticsEngine()
+    {
+        if (!$this->getClient())
+            throw new \Exception('No Analytics Client Provided Yet.');
+
+        $analytics = new Google_Service_Analytics($this->getClient());
+
+        return $analytics;
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -107,14 +144,80 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
 
     // -----------------------------------------------------------------------------------------------------
 
+    /**
+     * Get Analytics Profile ID for Specific Domain
+     * - search google analytic account for specific name
+     * - search properties on account for specific domain
+     * - get track id from that profile with domain
+     *
+     * @throws \Exception
+     * @return string
+     */
     protected function getAnalyticsProfileId()
     {
-        // TODO: Implement getAnalyticsProfileId() method.
-    }
+        if ($this->analytic_account_profile_trackid)
+            return $this->analytic_account_profile_trackid;
 
-    protected function getAnalyticsProfileDomain()
-    {
-        // TODO: Implement getAnalyticsProfileDomain() method.
+        /**
+         * From:
+         * @see https://developers.google.com/analytics/devguides/reporting/core/v3/
+         * Find:
+         * "There are a couple of ways to find your view (profile) ID."
+         */
+        $analytics = $this->getAnalyticsEngine();
+
+        $accounts = $analytics->management_accounts->listManagementAccounts();
+        $accuredAccountId = false;
+        if (count($accounts->getItems()) > 0) {
+            $items = $accounts->getItems();
+
+            /** @var $item Google_Service_Analytics_Account */
+            foreach ($items as $item) {
+                if ($item->getName() != $this->analytics_account_name)
+                    continue;
+
+                $accuredAccountId = $item->getId();
+            }
+
+            if (!$accuredAccountId)
+                throw new \Exception(sprintf('Account %s not found in analytics.', $this->analytics_account_name));
+
+            $webproperties = $analytics->management_webproperties
+                ->listManagementWebproperties($accuredAccountId);
+
+            $accWebpropertyId = false;
+            if (count($webproperties->getItems()) > 0) {
+                $items = $webproperties->getItems();
+
+                /** @var $item Google_Service_Analytics_Webproperty */
+                foreach($items as $item) {
+                    $itemWebUrl = parse_url($item->getWebsiteUrl());
+                    $itemWebUrl = $itemWebUrl['host'];
+                    if ($itemWebUrl != $this->analytics_account_profile_domain)
+                        continue;
+
+                    $accWebpropertyId = $item->getId();
+                }
+
+                if (!$accWebpropertyId)
+                    throw new \Exception(
+                        sprintf(
+                            'No Profile found on "%s" account with registered "%s" domain.',
+                            $this->analytics_account_name,
+                            $this->analytics_account_profile_domain
+                        )
+                    );
+
+                return $accWebpropertyId;
+
+            } else {
+                throw new \Exception(
+                    sprintf('No Profile found on "%s" Analytics Account.', $this->analytics_account_name)
+                );
+            }
+        } else {
+            throw new \Exception('Analytics Account Has No Account Defined.');
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------
