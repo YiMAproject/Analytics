@@ -235,7 +235,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
             return $this->internal_property_view_id;
 
         //                                         --- return first accrued profile with this common key ----
-        $profile = $this->getAnalyticsWebProperty(array('webPropertyId' => $this->getAnalyticsPropertyId()));
+        $profile = $this->getAnalyticsWebProfile(array('webPropertyId' => $this->getAnalyticsPropertyId()));
         if ($profile)
             $this->internal_property_view_id = $profile['id'];
 
