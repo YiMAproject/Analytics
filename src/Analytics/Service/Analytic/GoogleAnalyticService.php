@@ -322,7 +322,12 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      */
     public function onRenderAttachJScripts(MvcEvent $e)
     {
-        $profileID  = $this->getAnalyticsProfileId();
+        try {
+            $profileID  = $this->getAnalyticsProfileId();
+        } catch (\Exception $e) {
+            $profileID  = false;
+        }
+
         if (!$profileID)
             return false;
 
