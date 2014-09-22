@@ -22,22 +22,31 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     protected $analytics;
 
     /**
-     * @var Analytics Account Name
+     * @var Analytics Account ID
      */
-    protected $analytics_account_name = 'Raya Media';
+    protected $analytics_account_id;
+
+        /**
+         * Not Necessary if has Account ID
+         *
+         * @var Analytics Account Name
+         */
+        protected $analytics_account_name = 'Raya Media';
 
     /**
-     * @var Analytics Account Profile Domain
+     * @var Analytic Property ID
      */
-    protected $analytics_account_profile_name = 'Umetal';
+    protected $analytic_account_property_id;
 
-    /**
-     * @var Analytic Profile TrackID
-     */
-    protected $analytic_account_profile_id;
+        /**
+         * Not Necessary if has Property ID
+         *
+         * @var Analytics Account Profile Name
+         */
+        protected $analytics_account_profile_name = 'Umetal';
 
 
-    protected $internal_account_id;
+    protected $internal_property_view_id;
 
     /**
      * @var \DateTime
@@ -197,10 +206,10 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      * @throw \Exception
      * @return string
      */
-    protected function getAnalyticsProfileId()
+    protected function getAnalyticsPropertyId()
     {
-        if ($this->analytic_account_profile_id)
-            return $this->analytic_account_profile_id;
+        if ($this->analytic_account_property_id)
+            return $this->analytic_account_property_id;
 
         /**
          * From:
@@ -210,9 +219,27 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
          */
         $property = $this->getAnalyticsWebProperty(array('name' => $this->analytics_account_profile_name));
         if ($property)
-            $this->analytic_account_profile_id = $property['id'];
+            $this->analytic_account_property_id = $property['id'];
 
-        return $this->analytic_account_profile_id;
+        return $this->analytic_account_property_id;
+    }
+
+    /**
+     * Get Analytic Profile(View) ID from current Property
+     *
+     * @return string
+     */
+    protected function getAnalyticsProfileId()
+    {
+        if ($this->internal_property_view_id)
+            return $this->internal_property_view_id;
+
+        //                                         --- return first accrued profile with this common key ----
+        $profile = $this->getAnalyticsWebProperty(array('webPropertyId' => $this->getAnalyticsPropertyId()));
+        if ($profile)
+            $this->internal_property_view_id = $profile['id'];
+
+        return $this->internal_property_view_id;
     }
 
     /**
@@ -223,8 +250,8 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      */
     protected function getAnalyticsAccountID()
     {
-        if ($this->internal_account_id) {
-            return $this->internal_account_id;
+        if ($this->analytics_account_id) {
+            return $this->analytics_account_id;
         }
 
         $analytics = $this->getAnalyticsEngine();
@@ -246,9 +273,9 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
             throw new \Exception('Analytics Account Has No Account Defined.');
         }
 
-        $this->internal_account_id = $accruedAccountId;
+        $this->analytics_account_id = $accruedAccountId;
 
-        return $this->internal_account_id;
+        return $this->analytics_account_id;
     }
 
     /**
@@ -277,10 +304,70 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
             foreach($items as $item) {
                 $itemArray = [
                     'id'                    => $item->id,
+                    'accountId'             => $item->accountId,
                     'industryVertical'      => $item->industryVertical,
                     'internalWebPropertyId' => $item->internalWebPropertyId,
                     'level'                 => $item->level,
                     'name'                  => $item->name,
+                    'websiteUrl'            => $item->websiteUrl,
+                ];
+
+                if (count(array_intersect($itemArray, $props)) == count($props))
+                    return $itemArray;
+            }
+
+        } else {
+            throw new \Exception(
+                sprintf('No Property found on "%s" Analytics Account.', $this->analytics_account_name)
+            );
+        }
+
+        return array();
+    }
+
+    /**
+     * Search On Current Account For A Matched Profile(View) with props
+     * and return first accrued match
+     * ! use current account id
+     * ! use current property id
+     *
+     * @param array $props Match Against Property Item
+     *
+     * @throws \Exception
+     * @return array
+     */
+    protected function getAnalyticsWebProfile(array $props)
+    {
+        $accruedAccountId = $this->getAnalyticsAccountID();
+        if (!$accruedAccountId)
+            throw new \Exception(sprintf('Account %s not found in analytics.', $this->analytics_account_name));
+        $webPropertyId    = $this->getAnalyticsPropertyId();
+        if (!$accruedAccountId)
+            throw new \Exception(
+                sprintf('No Property "%s" found on "%s" Analytics Account.',
+                    $this->analytics_account_profile_name,
+                    $this->analytics_account_name
+                )
+            );
+
+        $analytics = $this->getAnalyticsEngine();
+        $profiles = $analytics->management_profiles
+            ->listManagementProfiles($accruedAccountId, $webPropertyId);
+
+        if (count($profiles->getItems()) > 0) {
+            $items = $profiles->getItems();
+
+            /** @var $item \Google_Service_Analytics_Profile */
+            foreach($items as $item) {
+                $itemArray = [
+                    'id'                    => $item->id,
+                    'name'                  => $item->name,
+                    'webPropertyId'         => $item->webPropertyId,
+                    'currency'              => $item->currency,
+                    'eCommerceTracking'     => $item->eCommerceTracking,
+                    'internalWebPropertyId' => $item->internalWebPropertyId,
+                    'timezone'              => $item->timezone,
+                    'type'                  => $item->type,
                     'websiteUrl'            => $item->websiteUrl,
                 ];
 
@@ -323,7 +410,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     public function onRenderAttachJScripts(MvcEvent $e)
     {
         try {
-            $profileID  = $this->getAnalyticsProfileId();
+            $profileID  = $this->getAnalyticsPropertyId();
         } catch (\Exception $e) {
             $profileID  = false;
         }
