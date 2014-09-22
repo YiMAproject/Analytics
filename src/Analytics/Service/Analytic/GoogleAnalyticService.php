@@ -22,28 +22,9 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     protected $analytics;
 
     /**
-     * @var Analytics Account ID
+     * @var GoogleAnalyticConfig
      */
-    protected $analytics_account_id;
-
-        /**
-         * Not Necessary if has Account ID
-         *
-         * @var Analytics Account Name
-         */
-        protected $analytics_account_name = 'Raya Media';
-
-    /**
-     * @var Analytic Property ID
-     */
-    protected $analytic_account_property_id;
-
-        /**
-         * Not Necessary if has Property ID
-         *
-         * @var Analytics Account Profile Name
-         */
-        protected $analytics_account_profile_name = 'Umetal';
+    protected $config;
 
 
     protected $internal_property_view_id;
@@ -88,6 +69,19 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     public function getClient()
     {
         return $this->client;
+    }
+
+    /**
+     * Get Config
+     *
+     * @return GoogleAnalyticConfig
+     */
+    public function config()
+    {
+        if (!$this->config)
+            $this->config = new GoogleAnalyticConfig();
+
+        return $this->config;
     }
 
     /**
@@ -208,8 +202,10 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      */
     protected function getAnalyticsPropertyId()
     {
-        if ($this->analytic_account_property_id)
-            return $this->analytic_account_property_id;
+        if ($this->config()->getPropertyId())
+            return $this->config()->getPropertyId();
+        elseif ($this->config()->getPropertyName() === null)
+            throw new \Exception('Once "Property ID" or "Property Name" Needed as Config.');
 
         /**
          * From:
@@ -217,11 +213,11 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
          * Find:
          * "There are a couple of ways to find your view (profile) ID."
          */
-        $property = $this->getAnalyticsWebProperty(array('name' => $this->analytics_account_profile_name));
+        $property = $this->getAnalyticsWebProperty(array('name' => $this->config()->getPropertyName()));
         if ($property)
-            $this->analytic_account_property_id = $property['id'];
+            $this->config()->setPropertyId($property['id']);
 
-        return $this->analytic_account_property_id;
+        return $this->config()->getPropertyId();
     }
 
     /**
@@ -250,9 +246,11 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      */
     protected function getAnalyticsAccountID()
     {
-        if ($this->analytics_account_id) {
-            return $this->analytics_account_id;
-        }
+        if ($this->config()->getAccountId())
+            return $this->config()->getAccountId();
+        elseif ($this->config()->getAccountName() === null)
+            throw new \Exception('Once "Account ID" or "Account Name" Needed as Config.');
+
 
         $analytics = $this->getAnalyticsEngine();
 
@@ -264,7 +262,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
             /** @var $item \Google_Service_Analytics_Account */
             foreach ($items as $item) {
                 //                      -- Current Account ----------
-                if ($item->getName() != $this->analytics_account_name)
+                if ($item->getName() != $this->config()->getAccountName())
                     continue;
 
                 $accruedAccountId = $item->getId();
@@ -273,9 +271,9 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
             throw new \Exception('Analytics Account Has No Account Defined.');
         }
 
-        $this->analytics_account_id = $accruedAccountId;
+        $this->config()->setAccountId($accruedAccountId);
 
-        return $this->analytics_account_id;
+        return $this->config()->getAccountId();
     }
 
     /**
@@ -291,7 +289,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     {
         $accruedAccountId = $this->getAnalyticsAccountID();
         if (!$accruedAccountId)
-            throw new \Exception(sprintf('Account %s not found in analytics.', $this->analytics_account_name));
+            throw new \Exception(sprintf('Account %s not found in analytics.', $this->config()->getAccountName()));
 
         $analytics = $this->getAnalyticsEngine();
         $webproperties = $analytics->management_webproperties
@@ -318,7 +316,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
 
         } else {
             throw new \Exception(
-                sprintf('No Property found on "%s" Analytics Account.', $this->analytics_account_name)
+                sprintf('No Property found on "%s" Analytics Account.', $this->config()->getAccountName())
             );
         }
 
@@ -340,13 +338,13 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     {
         $accruedAccountId = $this->getAnalyticsAccountID();
         if (!$accruedAccountId)
-            throw new \Exception(sprintf('Account %s not found in analytics.', $this->analytics_account_name));
+            throw new \Exception(sprintf('Account %s not found in analytics.', $this->config()->getAccountName()));
         $webPropertyId    = $this->getAnalyticsPropertyId();
         if (!$accruedAccountId)
             throw new \Exception(
                 sprintf('No Property "%s" found on "%s" Analytics Account.',
-                    $this->analytics_account_profile_name,
-                    $this->analytics_account_name
+                    $this->config()->getPropertyName(),
+                    $this->config()->getAccountName()
                 )
             );
 
@@ -377,7 +375,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
 
         } else {
             throw new \Exception(
-                sprintf('No Profile found on "%s" Analytics Account.', $this->analytics_account_name)
+                sprintf('No Profile found on "%s" Analytics Account.', $this->config()->getAccountName())
             );
         }
 
