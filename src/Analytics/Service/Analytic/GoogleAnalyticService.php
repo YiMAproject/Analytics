@@ -24,17 +24,20 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     /**
      * @var Analytics Account Name
      */
-    protected $analytics_account_name = 'ZUOO';
+    protected $analytics_account_name = 'Raya Media';
 
     /**
      * @var Analytics Account Profile Domain
      */
-    protected $analytics_account_profile_domain = 'dehoutoven.nl';
+    protected $analytics_account_profile_name = 'Umetal';
 
     /**
      * @var Analytic Profile TrackID
      */
-    protected $analytic_account_profile_trackid;
+    protected $analytic_account_profile_id;
+
+
+    protected $internal_account_id;
 
     /**
      * @var \DateTime
@@ -81,7 +84,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     /**
      * The client object is used to create an authorized analytics service object.
      *
-     * @return Google_Service_Analytics
+     * @return \Google_Service_Analytics
      * @throws \Exception
      */
     protected function getAnalyticsEngine()
@@ -191,13 +194,13 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      * - search properties on account for specific domain
      * - get track id from that profile with domain
      *
-     * @throws \Exception
+     * @throw \Exception
      * @return string
      */
     protected function getAnalyticsProfileId()
     {
-        if ($this->analytic_account_profile_trackid)
-            return $this->analytic_account_profile_trackid;
+        if ($this->analytic_account_profile_id)
+            return $this->analytic_account_profile_id;
 
         /**
          * From:
@@ -205,60 +208,93 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
          * Find:
          * "There are a couple of ways to find your view (profile) ID."
          */
+        $property = $this->getAnalyticsWebProperty(array('name' => $this->analytics_account_profile_name));
+        if ($property)
+            $this->analytic_account_profile_id = $property['id'];
+
+        return $this->analytic_account_profile_id;
+    }
+
+    /**
+     * Get AnalyticAccountID
+     *
+     * @throws \Exception
+     * @return false|string
+     */
+    protected function getAnalyticsAccountID()
+    {
+        if ($this->internal_account_id) {
+            return $this->internal_account_id;
+        }
+
         $analytics = $this->getAnalyticsEngine();
 
         $accounts = $analytics->management_accounts->listManagementAccounts();
-        $accuredAccountId = false;
+        $accruedAccountId = false;
         if (count($accounts->getItems()) > 0) {
             $items = $accounts->getItems();
 
-            /** @var $item Google_Service_Analytics_Account */
+            /** @var $item \Google_Service_Analytics_Account */
             foreach ($items as $item) {
+                //                      -- Current Account ----------
                 if ($item->getName() != $this->analytics_account_name)
                     continue;
 
-                $accuredAccountId = $item->getId();
-            }
-
-            if (!$accuredAccountId)
-                throw new \Exception(sprintf('Account %s not found in analytics.', $this->analytics_account_name));
-
-            $webproperties = $analytics->management_webproperties
-                ->listManagementWebproperties($accuredAccountId);
-
-            $accWebpropertyId = false;
-            if (count($webproperties->getItems()) > 0) {
-                $items = $webproperties->getItems();
-
-                /** @var $item Google_Service_Analytics_Webproperty */
-                foreach($items as $item) {
-                    $itemWebUrl = parse_url($item->getWebsiteUrl());
-                    $itemWebUrl = $itemWebUrl['host'];
-                    if ($itemWebUrl != $this->analytics_account_profile_domain)
-                        continue;
-
-                    $accWebpropertyId = $item->getId();
-                }
-
-                if (!$accWebpropertyId)
-                    throw new \Exception(
-                        sprintf(
-                            'No Profile found on "%s" account with registered "%s" domain.',
-                            $this->analytics_account_name,
-                            $this->analytics_account_profile_domain
-                        )
-                    );
-
-                return $accWebpropertyId;
-
-            } else {
-                throw new \Exception(
-                    sprintf('No Profile found on "%s" Analytics Account.', $this->analytics_account_name)
-                );
+                $accruedAccountId = $item->getId();
             }
         } else {
             throw new \Exception('Analytics Account Has No Account Defined.');
         }
+
+        $this->internal_account_id = $accruedAccountId;
+
+        return $this->internal_account_id;
+    }
+
+    /**
+     * Search On Current Account For A Matched Property with props
+     * and return first accrued match
+     *
+     * @param array $props Match Against Property Item
+     *
+     * @throws \Exception
+     * @return array
+     */
+    protected function getAnalyticsWebProperty(array $props)
+    {
+        $accruedAccountId = $this->getAnalyticsAccountID();
+        if (!$accruedAccountId)
+            throw new \Exception(sprintf('Account %s not found in analytics.', $this->analytics_account_name));
+
+        $analytics = $this->getAnalyticsEngine();
+        $webproperties = $analytics->management_webproperties
+            ->listManagementWebproperties($accruedAccountId);
+
+        if (count($webproperties->getItems()) > 0) {
+            $items = $webproperties->getItems();
+
+            /** @var $item \Google_Service_Analytics_Webproperty */
+            foreach($items as $item) {
+                $itemArray = [
+                    'id'                    => $item->id,
+                    'industryVertical'      => $item->industryVertical,
+                    'internalWebPropertyId' => $item->internalWebPropertyId,
+                    'level'                 => $item->level,
+                    'name'                  => $item->name,
+                    'websiteUrl'            => $item->websiteUrl,
+                ];
+
+                if (count(array_intersect($itemArray, $props)) == count($props))
+                    return $itemArray;
+            }
+
+        } else {
+            throw new \Exception(
+                sprintf('No Profile found on "%s" Analytics Account.', $this->analytics_account_name)
+            );
+        }
+
+        return array();
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -287,9 +323,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
     public function onRenderAttachJScripts(MvcEvent $e)
     {
         $profileID  = $this->getAnalyticsProfileId();
-        $profDomain = $this->analytics_account_profile_domain;
-
-        if (!$profileID || !$profDomain)
+        if (!$profileID)
             return false;
 
         if ($e->getResult() instanceof Response
@@ -314,7 +348,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
               m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
               })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-              ga('create', '".$profileID."', '".$profDomain."');
+              ga('create', '".$profileID."', 'auto');
               ga('send', 'pageview');
         ");
 
