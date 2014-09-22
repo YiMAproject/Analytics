@@ -197,7 +197,7 @@ class GoogleAnalyticService implements ListenerAnalyticInterface
      * - search properties on account for specific domain
      * - get track id from that profile with domain
      *
-     * @throw \Exception
+     * @throws \Exception
      * @return string
      */
     protected function getAnalyticsPropertyId()
