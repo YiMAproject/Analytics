@@ -35,22 +35,18 @@ return array(
                 // client id, client secret, and to register your redirect uri.
                 'client_id'   => array(
                     # used as default value
-                    'value' => '662442608195-c471t6g3lkpbbc7gcn36l5gjpimpk6dd.apps.googleusercontent.com',
                     'label' => 'Client ID',
                 ),
                 'client_secret'   => array(
                     # used as default value
-                    'value' => 'IUPSwDqehwlTMZThks_-05Up',
                     'label' => 'Client Secret',
                 ),
                 'developer_key'   => array(
                     # used as default value
-                    'value' => '662442608195-c471t6g3lkpbbc7gcn36l5gjpimpk6dd@developer.gserviceaccount.com',
                     'label' => 'Developer Key',
                 ),
                 'redirect_uri'   => array(
                     # used as default value
-                    'value' => 'http://dev.crm.zuoo.nl/analytics',
                     'label' => 'Redirect URL',
                     # form element
                     'element' => array(
@@ -68,8 +64,13 @@ return array(
                 ),
                 'refresh_token'   => array(
                     # used as default value
-                    'value' => '1/hkSAziKfXhHdmkXWOHJjYJSCtg16f4HMKUsx5yQi7Ek',
                     'label' => 'Refresh Token',
+                ),
+            ),
+            'options' => array(
+                // default values
+                'default_values' => array(
+
                 ),
             ),
         ),
