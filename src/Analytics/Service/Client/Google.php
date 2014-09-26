@@ -2,6 +2,7 @@
 namespace Analytics\Service\Client;
 
 use Analytics\Service\Client\Interfaces\ClientOauthInterface;
+use yimaSettings\DataStore\FileStore\FileCollection;
 use Zend\Feed\Reader\Http\ResponseInterface;
 use Zend\Json\Json;
 use Zend\ServiceManager\ServiceManager;
@@ -212,19 +213,17 @@ class Google implements
      */
     protected function getRefreshToken()
     {
-        $settStorage = $this->getSettingStorage()
-            ->get('analytics');
+        $settStorage = $this->getSettingStorage();
 
-        return $settStorage->get('refresh_token')->value;
+        return $settStorage->fetch()
+            ->get('refresh_token');
     }
 
     protected function setRefreshToken($token)
     {
         $settStorage   = $this->getSettingStorage();
-        $storageEntity = $settStorage->get('analytics');
-        $refreshToken  = $storageEntity->get('refresh_token');
-        $refreshToken->value = $token;
-        $storageEntity->set('refresh_token', $refreshToken);
+        $storageEntity = $settStorage->fetch();
+        $storageEntity->set('refresh_token', $token);
 
         $settStorage->save($storageEntity);
     }
@@ -243,13 +242,13 @@ class Google implements
      * Get Settings Storage
      * : to retrieve and write some settings
      *
-     * @return \yimaSettings\Service\Settings
+     * @return FileCollection
      */
     protected function getSettingStorage()
     {
-        /** @var $settings \yimaSettings\Service\Settings */
-        $settings = $this->sm->get('yimaSettings');
+        $collection = $this->sm->get('yimaSettings')
+            ->using('analytics');
 
-        return $settings;
+        return $collection;
     }
 }
