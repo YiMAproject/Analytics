@@ -33,16 +33,16 @@ return array(
             'properties' => array(
                 // Visit https://console.developers.google.com/ to generate your
                 // client id, client secret, and to register your redirect uri.
-                'client_id'   => array(
+                'client_id' => array(
                     'label' => 'Client ID',
                 ),
-                'client_secret'   => array(
+                'client_secret' => array(
                     'label' => 'Client Secret',
                 ),
-                'developer_key'   => array(
+                'developer_key' => array(
                     'label' => 'Developer Key',
                 ),
-                'redirect_uri'   => array(
+                'redirect_uri' => array(
                     'label' => 'Redirect URL',
                     # form element
                     'element' => array(

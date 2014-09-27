@@ -70,6 +70,8 @@ class IndexController extends AbstractActionController
             return $this->getResponse();
         }
 
-        die('Not Permitted To Access.');
+        // Access denied
+        return $this->getResponse()
+            ->setStatusCode(302);
     }
 }
